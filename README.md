@@ -7,7 +7,7 @@ The training set is used to build machine learning models.Feature engineering is
 
 The test set is used to see how well model performs on unseen data. For the test set, the ground truth for each passenger is not provided. The job to predict these outcomes. For each passenger in the test set, trained model is used to predict whether or not they survived the sinking of the Titanic.
 
-I have used feature engineering to create some new features like Title, FamilyName etc. And RandomForest model is used to predict survival on test dataset
+I have used feature engineering to create some new features like Title, FamilyName etc. And RandomForest model is used to predict survival on test dataset. Final solution is saved in final_solution.csv file. Accuracy on test dataset is 0.79904
 
 ###Variable Notes
 pclass: A proxy for socio-economic status (SES)
