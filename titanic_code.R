@@ -234,7 +234,9 @@ varImpPlot(rf)
 # Predict using the test set
 test$Survived <- predict(rf, test)
 
-
+# Create final solution file
+final_solution<-test[,c('PassengerId','Survived')]
+write.csv(final_solution, file = 'final_Solution.csv', row.names = F)
                   
                
 
