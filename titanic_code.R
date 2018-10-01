@@ -1,3 +1,4 @@
+library(plyr)
 library(dplyr)
 library(caret)
 library(randomForest)
@@ -146,26 +147,19 @@ full[1044,]
 full$Fare[1044] <- median(full[full$Pclass == '3' & full$Embarked == 'S', ]$Fare, na.rm = TRUE)
 
 ##age
-ageData <- mice(full[, !names(full) %in% c("Survived", "Name", "PassengerId", "Ticket", "AgeClass", "Cabin", "FamilyName")],m=8,maxit=8,meth='pmm',seed=200)
-head(ageData$imp$Age)
+## We will group data det by variables PClass and Title and replace missing Age value in that group by group median. 
+impute.median <- function(x) replace(x, is.na(x), median(x, na.rm = TRUE))
+full<-ddply(full, ~ Pclass+Title, transform, Age = impute.median(Age))
 
-# Check if the imputed data distribution follows the existing age distribution.
-ggplot(full,aes(x=Age)) + 
-  geom_density(data=data.frame(full$PassengerId, complete(ageData,6)), alpha = 0.2, fill = "blue")+
-  geom_density(data=full, alpha = 0.2, fill = "Red")+
-  labs(title="Age Distribution")+
-  labs(x="Age")
-
-# Sixth imputed data is picked up for further analysis based on the density distribution
-full.imp <- data.frame(full$PassengerId, complete(ageData,6))
-
-full$Age = full.imp$Age
-
+                         
 ## AgeClass
+                       
 full$Agegroup = ifelse(full$Age<=10,1,
                        ifelse(full$Age>10 & full$Age<=20,2,
                               ifelse(full$Age>20 & full$Age<=35,3,4)))
 full$Agegroup = as.factor(full$Agegroup)
+# Child
+full$Child= ifelse(full$Age<10,1,0)
 
 ## Cabin
 # Note: This procedure has been taken from script submitted on Kaggle.
@@ -229,6 +223,9 @@ full1<-full[,-c(4,9,11,17)]
 ###Now lets build randomforest model
 training = full1[1:891,]
 test = full1[892:1309,]
+
+## Remove PassengerId variable from training data as it will not contribute in model building
+training<-training[,-1]
 
 rf<- randomForest(factor(Survived)~. , data = training)
 rf                           
